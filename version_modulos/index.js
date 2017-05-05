@@ -1,49 +1,63 @@
 'use strict';
 
 const fs = require('fs');
-const path = require('path');
+const async = require('async');
+const versionModulo = require('./versionModulo');
 
-// en lugar de usar readFile, podemos usar directamente require: nos lee el fichero y lo parsea si
-// es un JSON... pero de forma síncrona!!
-// const packageJSON = require('./node_modules/chance/package.json');
 
-function versionModulo (nombreModulo, callback){
-
-    const fichero = path.join('./node_modules', nombreModulo, 'package.json');
-
-    // leemos contenido de un fichero package.json
-    fs.readFile(fichero, 'utf-8', (err, data) => {
+function versionModulos (callback) {
+    // leemos contenido de node_modules
+    fs.readdir('./node_modules', (err, lista) => {
         if (err) {
             callback(err);
             return;
         }
 
-        try {
-            // parseamos el contenido del fichero convirtiendolo en un objeto (síncrono!!)
-            // usamos 'var' para que haga hoisting (const y let no lo hacen) y así que sea visible
-            // fuera del try/catch
-            var packageJSON = JSON.parse(data);
+        // esta función la vamos a ejecutar con cada elemento de la lista de directorios
+        function iterador(item, callbackIterador) {
+            // descartamos ficheros o carpetas que empiecen por '.'
+            if (item[0] === '.'){
+                callbackIterador(null); // No hace falta pasarle el error si todo ha ido bien
+                return;
+            }
 
-        } catch (err) {
-            callback(err);
-            return;
+            versionModulo(item, (err, version) => {
+                if (err) {
+                    callbackIterador(err);
+                    return;
+                }
+
+                callbackIterador(null, {nombre: item, version: version});
+            });
         }
 
-        // obtenemos la version (si no existe, tomará la opción alternativa -> || '')
-        const version = packageJSON.version || '';
+        /*      PODEMOS SUPRIMIR LA FUNCIÓN DE CALLBACK (ver más abajo)
+        async.concat(lista, iterador, (err, resultados) => {
+            if (err) {
+                callback(err);
+                return;
+            }
 
-        // retornamos la version
-        callback(null, version);
+            callback(null, resultados);
+        });
+        */
+
+        // devolvemos la lista de módulos
+        async.concat(lista, iterador, callback);
 
     });
 }
 
 
-versionModulo ('chance', (err, data) => {
+versionModulos ( (err, listaModulos) => {
     if (err) {
         console.error('Hubo un error', err);
         return;
     }
 
-    console.log('La versión del módulo es', data);
+    // nos recorremos listaModulos para pintarlos en la consola
+    // y como console.log no es asíncrono, podemos hacer un bucle
+    for (let i = 0; i < listaModulos.length; i++) {
+        console.log('El módulo', listaModulos[i].nombre, 'tiene la versión', listaModulos[i].version);
+    }
 });

@@ -9,6 +9,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "chance": "^1.0.8"
+    "async": "^2.4.0",
+    "chance": "^1.0.8",
+    "express": "^4.15.2"
   }
 }
