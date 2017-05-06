@@ -2,6 +2,7 @@
 
 const fs = require('fs');
 const async = require('async');
+//import async from 'async/concat';
 const versionModulo = require('./versionModulo');
 
 
