@@ -14,7 +14,7 @@ const connection = mysql.createConnection({
 // Establecemos la conexión que hemos creado
 connection.connect();
 
-// Lanzamos una consulta a la bd
+// Lanzamos una consulta a la db 'cursonode' a la tabla/colección 'agentes'
 connection.query('SELECT * FROM agentes', (err, rows, fields) => {
     if (err) {
         console.log('Error:', err);
