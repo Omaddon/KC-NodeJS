@@ -7,5 +7,28 @@
   <body>
     <h1><%= title %></h1>
     <p>Welcome to <%= title %></p>
+
+    <hr/>
+
+    <h2>Valor sin escapar</h2>
+    <!-- con %- se inyectaría el código (alert en nuestro caso) -->
+    <!-- OJO!! que los tag se detectan incluso dentro de los comentarios -->
+    <%= valor %>
+
+    <hr/>
+
+    <h2>Incluir una condicion</h2>
+    <% if (condicion.estado) { %>
+      <p> <%= condicion.segundo %> es par </p>
+    <% } else { %>
+      <p> <%= condicion.segundo %> es impar </p>
+    <% } %>
+    
+    <hr/>
+
+    <% users.forEach(user => { %>
+      <p> <%= user.name + ' ' + user.age %> </p>
+    <% }) %>
+    
   </body>
 </html>

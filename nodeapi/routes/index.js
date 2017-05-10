@@ -3,7 +3,22 @@ var router = express.Router();
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Express' });
+
+  const segundo = (new Date()).getSeconds();
+
+  res.render('index', { 
+    title: 'Express',
+    valor: '<script>alert("cuidado!")</script>',
+    condicion: {
+      segundo: segundo,
+      estado: segundo % 2 === 0
+    },
+    users: [
+      { name: 'Smith', age: 42},
+      { name: 'Thomas', age: 32},
+      { name: 'Jones', age: 25}
+    ]
+  });
 });
 
 /*
