@@ -5,6 +5,9 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
+require('./lib/connectMongoose');
+require('./models/Agente');
+
 var app = express();
 
 // __dirname es una variable reservada de Express que te da la ruta del fichero actual
@@ -22,7 +25,8 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Rutas de nuestra app
-app.use('/', require('./routes/index'));
+app.use('/',              require('./routes/index'));
+app.use('/apiv1/agentes', require('./routes/apiv1/agentes'));
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -33,13 +37,23 @@ app.use(function(req, res, next) {
 
 // error handler
 app.use(function(err, req, res, next) {
+  res.status(err.status || 500);
+  
+  if (isAPI(req)) {
+    res.json({success: false, error: err.message});
+    return;
+  }
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
 
   // render the error page
-  res.status(err.status || 500);
   res.render('error');
 });
+
+// nos creamos una auxiliar para filtrar cómo se muestran los errores de la API
+function isAPI(req) {
+  return req.originalUrl.indexOf('/apiv') === 0;
+}
 
 module.exports = app;
